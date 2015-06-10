@@ -1,0 +1,22 @@
+{
+  "name": "twitter-media",
+  "version": "0.0.1",
+  "description": "Library for handling Twitter media uploads",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "keywords": [
+    "twitter",
+    "media",
+    "upload",
+    "video",
+    "image"
+  ],
+  "author": "Jan Zaloudek",
+  "license": "ISC",
+  "dependencies": {
+    "promise": "^7.0.1",
+    "request": "^2.57.0"
+  }
+}
