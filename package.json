@@ -14,9 +14,8 @@
     "image"
   ],
   "author": "Jan Zaloudek",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
-    "promise": "^7.0.1",
     "request": "^2.57.0"
   }
 }
