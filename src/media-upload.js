@@ -12,7 +12,7 @@ MediaUpload.SUPPORTED_TYPES = ['image', 'video'];
 MediaUpload.UPLOAD_ENDPOINT = 'https://upload.twitter.com/1.1/media/upload.json';
 
 MediaUpload.prototype.uploadImageSet = function (images, callback) {
-
+	throw new Error('Not implemented yet!');
 };
 
 MediaUpload.prototype.uploadMedia = function (type, media, callback) {
