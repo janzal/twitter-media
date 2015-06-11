@@ -1,6 +1,6 @@
 {
   "name": "twitter-media",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Library for handling Twitter media uploads",
   "main": "index.js",
   "scripts": {
@@ -17,5 +17,9 @@
   "license": "MIT",
   "dependencies": {
     "request": "^2.57.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/janzal/twitter-media.git"
   }
 }
