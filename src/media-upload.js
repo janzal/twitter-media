@@ -54,7 +54,7 @@ MediaUpload.prototype._uploadVideo = function (media, callback) {
 	var self = this;
 
 	// lil' callback hell
-	this._initUpload(type, media, function (err, media_id) {
+	this._initUpload(media, function (err, media_id) {
 		self._appendMedia(media_id, media, function (err) {
 			self._finalizeUpload(media_id, callback);
 		});
