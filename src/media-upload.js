@@ -26,10 +26,31 @@ MediaUpload.prototype.uploadMedia = function (type, media, callback) {
 		return callback(new Error('Media has to be a Buffer instance'));
 	}
 
-	this._uploadMedia(type, media, callback);
+	if (type === 'image') {
+		this._uploadImage(media, callback);
+	} else {
+		this._uploadVideo(media, callback);
+	}
 };
 
-MediaUpload.prototype._uploadMedia = function (type, media, callback) {
+MediaUpload.prototype._uploadImage = function (media, callback) {
+	this._postRequest({
+		formData: {
+			media: media
+		},
+		url: MediaUpload.UPLOAD_ENDPOINT,
+		json: true
+	}, function (err, response, body) {
+		if (err) {
+			return callback(err);
+		}
+		if (response.statusCode >= 200 && response.statusCode < 300) {
+			return callback(null, body.media_id_string, body);
+		} else return callback(new Error('Error occured while uploading media'));
+	});
+};
+
+MediaUpload.prototype._uploadVideo = function (media, callback) {
 	var self = this;
 
 	// lil' callback hell
@@ -49,14 +70,14 @@ MediaUpload.prototype._postRequest = function (params, callback) {
 	});
 };
 
-MediaUpload.prototype._initUpload = function (type, media, callback) {
+MediaUpload.prototype._initUpload = function (media, callback) {
 	if (!Buffer.isBuffer(media)) {
 		return callback(new Error('Media has to be a Buffer instance'));
 	}
 
 	var formData = {
 		command: 'INIT',
-		media_type: type === 'video'?'video/mp4':'image/png',
+		media_type: 'video/mp4',
 		total_bytes: media.length
 	};
 
