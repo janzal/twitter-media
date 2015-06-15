@@ -16,6 +16,7 @@
   "author": "Jan Zaloudek",
   "license": "MIT",
   "dependencies": {
+    "async": "^1.2.1",
     "request": "^2.57.0"
   },
   "repository": {
