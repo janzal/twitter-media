@@ -1,4 +1,5 @@
 var request = require('request');
+var async = require('async');
 
 var MediaUpload = function (oauth_options) {
 	if (typeof oauth_options !== 'object') {
@@ -10,6 +11,7 @@ var MediaUpload = function (oauth_options) {
 
 MediaUpload.SUPPORTED_TYPES = ['image', 'video'];
 MediaUpload.UPLOAD_ENDPOINT = 'https://upload.twitter.com/1.1/media/upload.json';
+MediaUpload.CHUNK_SIZE = 1084576;
 
 MediaUpload.prototype.uploadImageSet = function (images, callback) {
 	throw new Error('Not implemented yet!');
@@ -53,12 +55,11 @@ MediaUpload.prototype._uploadImage = function (media, callback) {
 MediaUpload.prototype._uploadVideo = function (media, callback) {
 	var self = this;
 
-	// lil' callback hell
-	this._initUpload(media, function (err, media_id) {
-		self._appendMedia(media_id, media, function (err) {
-			self._finalizeUpload(media_id, callback);
-		});
-	});
+	async.waterfall(
+			[	this._initUpload.bind(this, media),
+				this._appendMedia.bind(this),
+				this._finalizeUpload.bind(this) ],
+			callback);
 };
 
 MediaUpload.prototype._postRequest = function (params, callback) {
@@ -90,34 +91,65 @@ MediaUpload.prototype._initUpload = function (media, callback) {
 			return callback(err);
 		}
 
-		return callback(null, body.media_id_string);
+		return callback(null, body.media_id_string, media);
 	});
 };
 
+MediaUpload.prototype._splitMedia = function (media) {
+	var parts = [];
+
+	var partsCount = Math.ceil(media.length / MediaUpload.CHUNK_SIZE);
+
+	// console.log('Parts count', partsCount);
+
+	for (var partNr = 0; partNr < partsCount; partNr++) {
+		var startPointer = partNr * MediaUpload.CHUNK_SIZE;
+		var endPointer = (partNr === partsCount - 1)? undefined : (partNr + 1) * MediaUpload.CHUNK_SIZE;
+		// console.log('Parts nr %d begins at %d, ends at %s', partNr, startPointer, endPointer);
+		var part = media.slice(startPointer, endPointer);
+
+		parts.push(part);
+	}
+
+	return parts;
+};
+
 MediaUpload.prototype._appendMedia = function (media_id, media, callback) {
+	var self = this;
+
 	if (!Buffer.isBuffer(media)) {
 		return callback(new Error('Media has to be a Buffer instance'));
 	}
 
-	var formData = {
-		command: 'APPEND',
-		media_id: media_id,
-		segment_index: 0,
-		media: media
-	};
+	var parts = this._splitMedia(media);
 
-	this._postRequest({
-		url: MediaUpload.UPLOAD_ENDPOINT,
-		json: true,
-		formData: formData
-	}, function (err, response, body) {
-		if (err) {
-			return callback(err);
-		}
+	async.forEachOf(parts, function (part, index, callback) {
+		var formData = {
+			command: 'APPEND',
+			media_id: media_id,
+			segment_index: index,
+			media: part
+		};
 
-		if (response.statusCode >= 200 && response.statusCode < 300) {
-			return callback(null);
-		} else return callback(new Error('Error occured while uploading media'));
+		// console.log('Uploading segment %d of %d. Segment length %d', index, parts.length - 1, part.length);
+
+		self._postRequest({
+			url: MediaUpload.UPLOAD_ENDPOINT,
+			json: true,
+			formData: formData
+		}, function (err, response, body) {
+			if (err) {
+				return callback(err);
+			}
+
+			// console.log('Segment %d uploaded', index);
+
+			if (response.statusCode >= 200 && response.statusCode < 300) {
+				return callback(null);
+			} else return callback(new Error('Error occured while uploading media'));
+		});
+	}, function (err) {
+		callback(err, media_id);
 	});
 };
 
