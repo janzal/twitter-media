@@ -53,8 +53,8 @@ MediaUpload.prototype._uploadImage = function (media, callback) {
 		url: MediaUpload.UPLOAD_ENDPOINT,
 		json: true
 	}, function (err, response, body) {
-		if (err) {
-			return callback(err);
+		if (err || self._extractError(body)) {
+			return callback(err || self._extractError(body));
 		}
 		if (response.statusCode >= 200 && response.statusCode < 300) {
 			return callback(null, body.media_id_string, body);
@@ -82,6 +82,8 @@ MediaUpload.prototype._postRequest = function (params, callback) {
 };
 
 MediaUpload.prototype._initUpload = function (media, callback) {
+	var self = this;
+
 	if (!Buffer.isBuffer(media)) {
 		return callback(new Error('Media has to be a Buffer instance'));
 	}
@@ -97,12 +99,23 @@ MediaUpload.prototype._initUpload = function (media, callback) {
 		json: true,
 		formData: formData
 	}, function (err, response, body) {
-		if (err) {
-			return callback(err);
+		if (err || self._extractError(body)) {
+			return callback(err || self._extractError(body));
 		}
 
 		return callback(null, body.media_id_string, media);
 	});
+};
+
+MediaUpload.prototype._extractError = function (body) {
+	if (body && body.error) {
+		return new Error(body.error);
+	}
+
+	if (body && body.errors) {
+		var firstError = body.errors[0];
+		return new Error(firstError.message);
+	}
 };
 
 MediaUpload.prototype._splitMedia = function (media) {
@@ -148,11 +161,9 @@ MediaUpload.prototype._appendMedia = function (media_id, media, callback) {
 			json: true,
 			formData: formData
 		}, function (err, response, body) {
-			if (err) {
-				return callback(err);
+			if (err || self._extractError(body)) {
+				return callback(err || self._extractError(body));
 			}
-
-			// console.log('Segment %d uploaded', index);
 
 			if (response.statusCode >= 200 && response.statusCode < 300) {
 				return callback(null);
@@ -164,9 +175,11 @@ MediaUpload.prototype._appendMedia = function (media_id, media, callback) {
 };
 
 MediaUpload.prototype._finalizeUpload = function (media_id, callback) {
+	var self = this;
+
 	var formData = {
 		command: 'FINALIZE',
-		media_id: media_id,
+		media_id: media_id
 	};
 
 	this._postRequest({
@@ -174,8 +187,8 @@ MediaUpload.prototype._finalizeUpload = function (media_id, callback) {
 		json: true,
 		formData: formData
 	}, function (err, response, body) {
-		if (err) {
-			return callback(err);
+		if (err || self._extractError(body)) {
+			return callback(err || self._extractError(body));
 		}
 
 		return callback(null, body.media_id_string, body);
