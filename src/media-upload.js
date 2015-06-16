@@ -44,6 +44,8 @@ MediaUpload.prototype.uploadMedia = function (type, media, callback) {
 };
 
 MediaUpload.prototype._uploadImage = function (media, callback) {
+	var self = this;
+
 	this._postRequest({
 		formData: {
 			media: media
