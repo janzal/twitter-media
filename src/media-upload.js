@@ -14,7 +14,15 @@ MediaUpload.UPLOAD_ENDPOINT = 'https://upload.twitter.com/1.1/media/upload.json'
 MediaUpload.CHUNK_SIZE = 1084576;
 
 MediaUpload.prototype.uploadImageSet = function (images, callback) {
-	throw new Error('Not implemented yet!');
+	var self = this;
+
+	if (!Array.isArray(images)) {
+		return callback(new Error('Images has to be array of image buffers'));
+	}
+
+	async.map(images, function (image, callback) {
+		self.uploadMedia('image', image, callback);
+	}, callback);
 };
 
 MediaUpload.prototype.uploadMedia = function (type, media, callback) {
