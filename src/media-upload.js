@@ -134,12 +134,9 @@ MediaUpload.prototype._splitMedia = function (media) {
 
 	var partsCount = Math.ceil(media.length / MediaUpload.CHUNK_SIZE);
 
-	// console.log('Parts count', partsCount);
-
 	for (var partNr = 0; partNr < partsCount; partNr++) {
 		var startPointer = partNr * MediaUpload.CHUNK_SIZE;
 		var endPointer = (partNr === partsCount - 1)? undefined : (partNr + 1) * MediaUpload.CHUNK_SIZE;
-		// console.log('Parts nr %d begins at %d, ends at %s', partNr, startPointer, endPointer);
 		var part = media.slice(startPointer, endPointer);
 
 		parts.push(part);
@@ -164,8 +161,6 @@ MediaUpload.prototype._appendMedia = function (media_id, media, callback) {
 			segment_index: index,
 			media: part
 		};
-
-		// console.log('Uploading segment %d of %d. Segment length %d', index, parts.length - 1, part.length);
 
 		self._postRequest({
 			url: MediaUpload.UPLOAD_ENDPOINT,
@@ -232,8 +227,6 @@ MediaUpload.prototype._ensureCompleteness = function (body, callback) {
 
 	var isComplete = !body.processing_info || ['succeeded', 'failed'].indexOf(body.processing_info.state) >= 0;
 	var hasFailed = body.processing_info && body.processing_info.state === 'failed';
-
-	// console.log('Checking status of uploaded media', body.media_id_string);
 
 	if (!isComplete) {
 		var checkStatus = function() {
