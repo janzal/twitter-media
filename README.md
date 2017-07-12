@@ -1,6 +1,5 @@
 # twitter-media
 
-
 Simple module for uploading media to Twitter. It can handle images, videos and image sets and returns media_ids, which can be posted with Twitter statuses.
 
 ## API
@@ -16,7 +15,7 @@ An object containing Twitter API credentials
 		token: '...',
 		token_secret: '...'
 	}
-	
+
 ### TwitterMedia#uploadMedia(type, media, callback)
 
 #### type: String
@@ -31,15 +30,10 @@ Node.js buffer containing uploaded media
 #### images: [Buffer]
 Images argument is array of buffers containing uploaded images. Twitter allows up to 4 images at one tweet.
 
-## Testing
-Simple as
-
-	npm test
-
 ## License
 The MIT License (MIT)
 
-Copyright (c) 2015 Jan Žaloudek
+Copyright (c) 2017 Jan Žaloudek
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
