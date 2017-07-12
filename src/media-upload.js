@@ -81,6 +81,16 @@ MediaUpload.prototype._postRequest = function (params, callback) {
 	});
 };
 
+MediaUpload.prototype._getRequest = function (params, callback) {
+	params = params || {};
+	params.oauth = params.oauth || this.oauth_options;
+	params.method = 'GET';
+
+	request(params, function (err, response, body) {
+		callback(err, response, body);
+	});
+};
+
 MediaUpload.prototype._initUpload = function (media, callback) {
 	var self = this;
 
@@ -91,7 +101,8 @@ MediaUpload.prototype._initUpload = function (media, callback) {
 	var formData = {
 		command: 'INIT',
 		media_type: 'video/mp4',
-		total_bytes: media.length
+		total_bytes: media.length,
+		media_category: 'tweet_video'
 	};
 
 	this._postRequest({
@@ -191,8 +202,50 @@ MediaUpload.prototype._finalizeUpload = function (media_id, callback) {
 			return callback(err || self._extractError(body));
 		}
 
-		return callback(null, body.media_id_string, body);
+		return self._ensureCompleteness(body, callback);
 	});
 };
+
+MediaUpload.prototype._checkUploadStatus = function (media_id, callback) {
+	var self = this;
+
+	var params = {
+		command: 'STATUS',
+		media_id: media_id,
+	};
+
+	this._getRequest({
+		url: MediaUpload.UPLOAD_ENDPOINT,
+		json: true,
+		qs: params
+	}, function (err, response, body) {
+		if (err || self._extractError(body)) {
+			return callback(err || self._extractError(body));
+		}
+
+		return self._ensureCompleteness(body, callback);
+	});
+};
+
+MediaUpload.prototype._ensureCompleteness = function (body, callback) {
+	var self = this;
+
+	var isComplete = !body.processing_info || ['succeeded', 'failed'].indexOf(body.processing_info.state) >= 0;
+	var hasFailed = body.processing_info && body.processing_info.state === 'failed';
+
+	// console.log('Checking status of uploaded media', body.media_id_string);
+
+	if (!isComplete) {
+		var checkStatus = function() {
+			self._checkUploadStatus(body.media_id_string, callback);
+		};
+
+		setTimeout(checkStatus, body.processing_info.check_after_secs * 1000);
+	} else if (hasFailed) {
+		return callback(body);
+	} else {
+		return callback(null, body.media_id_string, body);
+	}
+}
 
 module.exports = MediaUpload;
