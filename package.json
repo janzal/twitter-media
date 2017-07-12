@@ -2,10 +2,7 @@
   "name": "twitter-media",
   "version": "0.1.0",
   "description": "Library for handling Twitter media uploads",
-  "main": "index.js",
-  "scripts": {
-    "test": "mocha"
-  },
+  "main": "src/media-upload.js",
   "keywords": [
     "twitter",
     "media",
