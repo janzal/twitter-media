@@ -24,7 +24,7 @@ module.exports = class MediaUpload {
 
     uploadMedia(type, media, cb) {
         if (!SUPPORTED_TYPES.has(type)) {
-            const error = new Error(`Unsupported media type ${type}`);
+            const error = new Error(`Unsupported media type. Expected one of: ${[...SUPPORTED_TYPES].join(', ')}`);
             cb && cb(error);
             return Promise.reject(error);
         }

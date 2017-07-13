@@ -30,6 +30,11 @@ Node.js buffer containing uploaded media
 #### images: [Buffer]
 Images argument is array of buffers containing uploaded images. Twitter allows up to 4 images at one tweet.
 
+## Testing
+Simple as
+
+	npm test
+
 ## License
 The MIT License (MIT)
 

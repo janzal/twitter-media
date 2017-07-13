@@ -1,0 +1,137 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Callback API Image upload 1`] = `
+Object {
+  "expires_after_secs": 86400,
+  "image": Object {
+    "h": 0,
+    "image_type": "image/jpeg",
+    "w": 0,
+  },
+  "media_id": 1,
+  "media_id_string": "1",
+  "size": 55984,
+}
+`;
+
+exports[`Callback API Image-set upload 1`] = `
+Array [
+  Object {
+    "expires_after_secs": 86400,
+    "image": Object {
+      "h": 0,
+      "image_type": "image/jpeg",
+      "w": 0,
+    },
+    "media_id": 1,
+    "media_id_string": "1",
+    "size": 55984,
+  },
+  Object {
+    "expires_after_secs": 86400,
+    "image": Object {
+      "h": 0,
+      "image_type": "image/jpeg",
+      "w": 0,
+    },
+    "media_id": 2,
+    "media_id_string": "2",
+    "size": 55984,
+  },
+  Object {
+    "expires_after_secs": 86400,
+    "image": Object {
+      "h": 0,
+      "image_type": "image/jpeg",
+      "w": 0,
+    },
+    "media_id": 3,
+    "media_id_string": "3",
+    "size": 55984,
+  },
+]
+`;
+
+exports[`Callback API Video upload 1`] = `
+Object {
+  "expires_after_secs": 86399,
+  "media_id": 1,
+  "media_id_string": "1",
+  "processing_info": Object {
+    "progress_percent": 100,
+    "state": "succeeded",
+  },
+  "size": 6295234,
+  "video": Object {
+    "video_type": "video/mp4",
+  },
+}
+`;
+
+exports[`Promise API Image upload 1`] = `
+Object {
+  "expires_after_secs": 86400,
+  "image": Object {
+    "h": 0,
+    "image_type": "image/jpeg",
+    "w": 0,
+  },
+  "media_id": 1,
+  "media_id_string": "1",
+  "size": 55984,
+}
+`;
+
+exports[`Promise API Image-set upload 1`] = `
+Array [
+  Object {
+    "expires_after_secs": 86400,
+    "image": Object {
+      "h": 0,
+      "image_type": "image/jpeg",
+      "w": 0,
+    },
+    "media_id": 1,
+    "media_id_string": "1",
+    "size": 55984,
+  },
+  Object {
+    "expires_after_secs": 86400,
+    "image": Object {
+      "h": 0,
+      "image_type": "image/jpeg",
+      "w": 0,
+    },
+    "media_id": 2,
+    "media_id_string": "2",
+    "size": 55984,
+  },
+  Object {
+    "expires_after_secs": 86400,
+    "image": Object {
+      "h": 0,
+      "image_type": "image/jpeg",
+      "w": 0,
+    },
+    "media_id": 3,
+    "media_id_string": "3",
+    "size": 55984,
+  },
+]
+`;
+
+exports[`Promise API Video upload 1`] = `
+Object {
+  "expires_after_secs": 86399,
+  "media_id": 1,
+  "media_id_string": "1",
+  "processing_info": Object {
+    "progress_percent": 100,
+    "state": "succeeded",
+  },
+  "size": 6295234,
+  "video": Object {
+    "video_type": "video/mp4",
+  },
+}
+`;
