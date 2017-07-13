@@ -99,7 +99,7 @@ module.exports = class APIClient {
             const defaultParams = { url: this.endpoint, oauth: this.oauth, json: true, method: 'POST' };
             request(Object.assign(defaultParams, params), (error, response, body) => {
                 const isOK = response.statusCode >= 200 && response.statusCode < 300;
-                isOK ? resolve(body) : reject(new Error(`Error occurred fetching with params: ${JSON.stringify(params)}. Response: ${JSON.stringify(response)}`));
+                isOK ? resolve(body) : reject(new Error(`Error occurred fetching with params: ${stringify(params)}. Response: ${stringify(response)}`));
             });
         }).then((response) => {
             const error = extractError(response);
@@ -118,4 +118,21 @@ function extractError(response) {
     if (errors.length > 0) {
         return new Error(errors[0]);
     }
+}
+
+function stringify(object) {
+    return JSON.stringify(
+        entries(object).reduce((state, [key, value]) => {
+            return Object.assign({}, state, { [key]: Buffer.isBuffer(value) ? stringifyBuffer(buffer) : value });
+        }, {})
+    );
+}
+
+function stringifyBuffer(buffer) {
+    const { data } = buffer.slice(0, 10).toJSON();
+    return `<Buffer ${data.map((byte) => byte.toString(16)).join(' ')} ...>`;
+}
+
+function entries(object) {
+    return Object.keys(object || {}).map((key) => [key, object[key]]);
 }
