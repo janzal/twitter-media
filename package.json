@@ -1,6 +1,6 @@
 {
   "name": "twitter-media",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Library for handling Twitter media uploads",
   "main": "index.js",
   "scripts": {
