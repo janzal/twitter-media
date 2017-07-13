@@ -1,8 +1,8 @@
+jest.mock('../api-client');
+
 const TwitterMedia = require('../');
 const path = require('path');
 const fs = require('fs');
-
-jest.mock('../api-client');
 
 const image = fs.readFileSync(path.join(__dirname, '..', '..', 'assets', 'image.jpg'));
 const video = fs.readFileSync(path.join(__dirname, '..', '..', 'assets', 'video.mp4'));
