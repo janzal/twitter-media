@@ -1,5 +1,6 @@
 const request = require('request');
 const splitBuffer = require('./split-buffer');
+const stringify = require('./stringify');
 
 const DEFAULT_CHUNK_SIZE = 1084576;
 
@@ -118,21 +119,4 @@ function extractError(response) {
     if (errors.length > 0) {
         return new Error(errors[0]);
     }
-}
-
-function stringify(object) {
-    return JSON.stringify(
-        entries(object).reduce((state, [key, value]) => {
-            return Object.assign({}, state, { [key]: Buffer.isBuffer(value) ? stringifyBuffer(buffer) : value });
-        }, {})
-    );
-}
-
-function stringifyBuffer(buffer) {
-    const { data } = buffer.slice(0, 10).toJSON();
-    return `<Buffer ${data.map((byte) => byte.toString(16)).join(' ')} ...>`;
-}
-
-function entries(object) {
-    return Object.keys(object || {}).map((key) => [key, object[key]]);
 }
