@@ -1,8 +1,8 @@
 {
   "name": "twitter-media",
   "description": "Library for handling Twitter media uploads",
-  "engines" : {
-    "node" : ">=6.0.0"
+  "engines": {
+    "node": ">=6.0.0"
   },
   "contributors": [
     "Jan Zaloudek",
@@ -13,7 +13,7 @@
     "type": "git",
     "url": "http://github.com/janzal/twitter-media.git"
   },
-  "version": "0.1.2",
+  "version": "0.2.0",
   "main": "src/index.js",
   "files": [
     "src"
