@@ -1,6 +1,9 @@
 {
   "name": "twitter-media",
   "description": "Library for handling Twitter media uploads",
+  "engines" : {
+    "node" : ">=6.0.0"
+  },
   "contributors": [
     "Jan Zaloudek",
     "Cameron Hunter <hello@cameronhunter.co.uk>"
