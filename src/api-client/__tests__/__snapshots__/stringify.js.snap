@@ -1,0 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`stringify an object containing a buffer 1`] = `"{\\"media\\":\\"<Buffer ff d8 ff e0 0 ...>\\"}"`;
+
+exports[`stringify an object containing a buffer in a nested value 1`] = `"{\\"method\\":\\"GET\\",\\"formData\\":{\\"media\\":\\"<Buffer ff d8 ff e0 0 ...>\\",\\"media_id\\":\\"123\\"}}"`;
