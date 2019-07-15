@@ -31,10 +31,11 @@ module.exports = class APIClient {
 
             appender.end = () => {
                 uploadJob.then(_ => this._finalizeUpload(mediaID).then(resolve))
+                    .catch(reject)
             }
 
             appender.on('error', err => {
-              reject(err)
+                reject(err)
             })
 
             sourceStream.pipe(chunker(DEFAULT_CHUNK_SIZE, { flush: true })).pipe(appender)
@@ -95,7 +96,7 @@ module.exports = class APIClient {
 
     _ensureCompleteness(response) {
         const { media_id_string: mediaID, processing_info: processingInfo } = response || {};
-        const { state, check_after_secs: delayInSeconds } = processingInfo || {};
+        const { state, check_after_secs: delayInSeconds, error } = processingInfo || {};
 
         var isComplete = new Set(['succeeded', 'failed']).has(state);
         var hasFailed = state === 'failed';
@@ -107,7 +108,9 @@ module.exports = class APIClient {
                 return this._checkUploadStatus(mediaID);
             });
         } else if (hasFailed) {
-            return Promise.reject(response);
+            const reject_err = new Error(error.message || 'unknown error')
+            reject_err.name = error.name
+            return Promise.reject(reject_err);
         } else {
             return Promise.resolve(response);
         }
