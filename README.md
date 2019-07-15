@@ -16,13 +16,13 @@ An object containing Twitter API credentials
 		token_secret: '...'
 	}
 
-### TwitterMedia#uploadMedia(type, media, callback)
+### TwitterMedia#uploadMedia(type, source, callback)
 
 #### type: String
 Possible values are: "image", "video"
 
-#### media: Buffer
-Node.js buffer containing uploaded media
+#### source: Buffer | String
+Node.js buffer containing uploaded media or url to fetch media from.
 
 
 ### TwitterMedia#uploadImageSet(images, callback)
