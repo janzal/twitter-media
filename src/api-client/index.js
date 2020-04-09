@@ -16,6 +16,7 @@ module.exports = class APIClient {
     }
 
     uploadVideo(sourceStream, size) {
+      sourceStream.pause();
       return new Promise((resolve, reject) => {
         let uploadJob
         this._initUpload(size).then((mediaID) => {
@@ -39,6 +40,7 @@ module.exports = class APIClient {
             })
 
             sourceStream.pipe(chunker(DEFAULT_CHUNK_SIZE, { flush: true })).pipe(appender)
+            sourceStream.resume();
 
         }).catch(reject)
       })
