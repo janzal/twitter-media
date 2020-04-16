@@ -1,8 +1,9 @@
 const request = require('request');
-const splitBuffer = require('./split-buffer');
 const stringify = require('./stringify');
+const chunker = require('stream-chunker');
+const stream = require('stream')
 
-const DEFAULT_CHUNK_SIZE = 1084576;
+const DEFAULT_CHUNK_SIZE = 542288;
 
 module.exports = class APIClient {
     constructor(oauth) {
@@ -14,15 +15,36 @@ module.exports = class APIClient {
         return this._request({ formData: { media: buffer } });
     }
 
-    uploadVideo(buffer, chunkSize) {
-        return Promise.resolve(buffer.length).then((size) => {
-            return this._initUpload(size);
-        }).then((mediaID) => {
-            return this._appendMedia(mediaID, buffer, chunkSize);
-        }).then((mediaID) => {
-            return this._finalizeUpload(mediaID);
-        });
-    }
+    uploadVideo(sourceStream, size) {
+      sourceStream.pause();
+      return new Promise((resolve, reject) => {
+        let uploadJob
+        this._initUpload(size).then((mediaID) => {
+            const appender = new stream.Writable();
+            let segmentIndex = 0;
+
+            appender._write = (chunk, encoding, done) => {
+              uploadJob = this._appendMedia(mediaID, chunk, segmentIndex).then(() => {
+                  segmentIndex++;
+                  done()
+              }).catch(done)
+            };
+
+            appender.end = () => {
+                uploadJob.then(_ => this._finalizeUpload(mediaID).then(resolve))
+                    .catch(reject)
+            }
+
+            appender.on('error', err => {
+                reject(err)
+            })
+
+            sourceStream.pipe(chunker(DEFAULT_CHUNK_SIZE, { flush: true })).pipe(appender)
+            sourceStream.resume();
+
+        }).catch(reject)
+      })
+    };
 
     _initUpload(size) {
         const params = {
@@ -37,8 +59,8 @@ module.exports = class APIClient {
         return this._request(params).then((json) => json.media_id_string);
     }
 
-    _appendMedia(mediaID, buffer, chunkSize = DEFAULT_CHUNK_SIZE) {
-        const params = (part, segmentIndex) => ({
+    _appendMedia(mediaID, buffer, segmentIndex) {
+      const params = (part, segmentIndex) => ({
             formData: {
                 command: 'APPEND',
                 media_id: mediaID,
@@ -47,9 +69,8 @@ module.exports = class APIClient {
             }
         });
 
-        const parts = splitBuffer(buffer, chunkSize);
-        const uploads = parts.map((part, index) => this._request(params(part, index)));
-        return Promise.all(uploads).then(() => mediaID);
+        return this._request(params(buffer, segmentIndex, mediaID))
+            .then(() => mediaID);
     }
 
     _finalizeUpload(mediaID) {
@@ -77,7 +98,7 @@ module.exports = class APIClient {
 
     _ensureCompleteness(response) {
         const { media_id_string: mediaID, processing_info: processingInfo } = response || {};
-        const { state, check_after_secs: delayInSeconds } = processingInfo || {};
+        const { state, check_after_secs: delayInSeconds, error } = processingInfo || {};
 
         var isComplete = new Set(['succeeded', 'failed']).has(state);
         var hasFailed = state === 'failed';
@@ -89,7 +110,9 @@ module.exports = class APIClient {
                 return this._checkUploadStatus(mediaID);
             });
         } else if (hasFailed) {
-            return Promise.reject(response);
+            const reject_err = new Error(error.message || 'unknown error')
+            reject_err.name = error.name
+            return Promise.reject(reject_err);
         } else {
             return Promise.resolve(response);
         }
@@ -100,7 +123,7 @@ module.exports = class APIClient {
             const defaultParams = { url: this.endpoint, oauth: this.oauth, json: true, method: 'POST' };
             request(Object.assign(defaultParams, params), (error, response, body) => {
                 const isOK = response.statusCode >= 200 && response.statusCode < 300;
-                isOK ? resolve(body) : reject(new Error(`Error occurred fetching with params: ${stringify(params)}. Response: ${stringify(response)}`));
+                isOK ? resolve(body) : reject(new Error(`Error occurred fetching with params: ${stringify(params)}. Response: ${stringify(body)}`));
             });
         }).then((response) => {
             const error = extractError(response);

@@ -23,12 +23,12 @@ module.exports = class MockApiClient {
         });
     }
 
-    uploadVideo(buffer) {
+    uploadVideo(sourceStream, size) {
         const id = this.getMediaID();
         return Promise.resolve({
             media_id: id,
             media_id_string: String(id),
-            size: buffer.length,
+            size: size,
             expires_after_secs: 86399,
             video: {
                 video_type: 'video/mp4'

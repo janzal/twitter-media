@@ -22,7 +22,8 @@
     "test": "jest"
   },
   "dependencies": {
-    "request": "^2.57.0"
+    "request": "^2.57.0",
+    "stream-chunker": "^1.2.8"
   },
   "devDependencies": {
     "jest": "^20.0.4"
