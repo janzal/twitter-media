@@ -14,9 +14,9 @@ module.exports = class APIClient {
         return this._request({ formData: { media: buffer } });
     }
 
-    uploadVideo(buffer, chunkSize) {
+    uploadVideo({ media: buffer, chunkSize, mediaType = 'video/mp4', mediaCategory = 'tweet_video' }) {
         return Promise.resolve(buffer.length).then((size) => {
-            return this._initUpload(size);
+            return this._initUpload(size, mediaType, mediaCategory);
         }).then((mediaID) => {
             return this._appendMedia(mediaID, buffer, chunkSize);
         }).then((mediaID) => {
@@ -24,12 +24,12 @@ module.exports = class APIClient {
         });
     }
 
-    _initUpload(size) {
+    _initUpload(size, mediaType, mediaCategory) {
         const params = {
             formData: {
                 command: 'INIT',
-                media_type: 'video/mp4',
-                media_category: 'tweet_video',
+                media_type: mediaType,
+                media_category: mediaCategory,
                 total_bytes: size
             }
         };

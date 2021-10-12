@@ -22,7 +22,7 @@ module.exports = class MediaUpload {
         });
     }
 
-    uploadMedia(type, media, cb) {
+    uploadMedia({ type, media, mediaType, mediaCategory }, cb) {
         if (!SUPPORTED_TYPES.has(type)) {
             const error = new Error(`Unsupported media type. Expected one of: ${[...SUPPORTED_TYPES].join(', ')}`);
             cb && cb(error);
@@ -35,7 +35,7 @@ module.exports = class MediaUpload {
             return Promise.reject(error);
         }
 
-        const upload = type === 'image' ? this._client.uploadImage(media) : this._client.uploadVideo(media);
+        const upload = type === 'image' ? this._client.uploadImage(media) : this._client.uploadVideo({ media, mediaType, mediaCategory });
 
         return upload.then((json) => {
             cb && cb(null, json.media_id_string, json);
